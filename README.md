@@ -1,2 +1,2 @@
 # syswatch
-A basic Lua program to monitor Mac system data. Mostly just want to try out Lua.
+A basic lua program for listing Mac stuff.
