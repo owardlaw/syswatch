@@ -61,16 +61,34 @@ function crawl(path)
     path = normalizeDir(path)
 
     local status, result_or_error = pcall(function() return recursiveSearch(path) end)
-    table.sort(files, function(a, b) return a.size > b.size end)
+    table.sort(files, function(a, b) return a.size < b.size end)
     return files, status
 end
 
+function isDir(name)
+    if type(name)~="string" then return false end
+    local cd = lfs.currentdir()
+    local is = lfs.chdir(name) and true or false
+    lfs.chdir(cd)
+    return is
+end
+
 function search.display_files_from_path(path)
+
+    if not isDir(path) then
+        print("Error: the path you entered is not a directory.")
+        return
+    end
+
     local files, status = crawl(path)
     for _, file in ipairs(files) do
         local normalizedSize = normalizeBytes(file.size)
         print(normalizedSize .. " - " .. file.path)
     end
+
+    local largest_file = files[#files]
+    local largest_file_size = normalizeBytes(largest_file.size)
+    print("\nLargest file: " .. largest_file_size .. " - " .. largest_file.path .. "\n")
 
     if not status then
         print("Error: some files were not reached due to permission errors, these probably are not files you want to delete.")
